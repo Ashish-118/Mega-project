@@ -6,7 +6,7 @@ const asyncHandler = (requestHandler) => {
             catch((err) => next(err))
     }
 }
-I
+
 export { asyncHandler }
 
 
