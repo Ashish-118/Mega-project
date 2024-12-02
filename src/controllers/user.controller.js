@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js"
-
+import { Video } from "../models/video.model.js"
 
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -458,6 +458,52 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 })
 
 
+const upload_video = asyncHandler(async (req, res) => {
+    const { title, description, duration } = req.body
+
+    if (
+        [title, description, duration].some((field) => field?.trim() === "")
+    ) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const videoFilePath = req.files?.videoFile?.path;
+    console.log(videoFilePath)
+    if (!videoFilePath) {
+        throw new ApiError(400, "Video file is missing")
+    }
+
+    const thumbnailFilePath = req.files?.thumbnail?.path;
+    if (!thumbnailFilePath) {
+        throw new ApiError(400, "Thumbnail file is missing")
+    }
+
+    const video = await uploadOnCloudinary(videoFilePath);
+    if (!video) {
+        throw new ApiError(400, "Error while uploading video to cloudinary")
+    }
+    const thumbnail = await uploadOnCloudinary(thumbnailFilePath);
+    if (!thumbnail) {
+        throw new ApiError(400, "Error while uploading thumbnail to cloudinary")
+    }
+
+    const newVideo = await Video.create(
+        {
+            title,
+            description,
+            duration,
+            video: video.url,
+            thumbnail: thumbnail.url,
+            owner: req.user._id
+        }
+    )
+
+
+    return res.status(201).json(
+        new ApiResponse(201, newVideo, `Video uploaded successfully by user id: ${req.user._id}`)
+    )
+
+})
 
 
 
@@ -472,5 +518,6 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    upload_video,
 }
