@@ -459,21 +459,23 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
 
 const upload_video = asyncHandler(async (req, res) => {
-    const { title, description, duration } = req.body
 
+    const { title, description, duration } = req.body
+    console.log(title)
     if (
         [title, description, duration].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All fields are required")
     }
 
-    const videoFilePath = req.files?.videoFile?.path;
+    const videoFilePath = req.files?.videoFile[0]?.path;
     console.log(videoFilePath)
     if (!videoFilePath) {
         throw new ApiError(400, "Video file is missing")
     }
 
-    const thumbnailFilePath = req.files?.thumbnail?.path;
+    const thumbnailFilePath = req.files?.thumbnail[0]?.path;
+    console.log(thumbnailFilePath)
     if (!thumbnailFilePath) {
         throw new ApiError(400, "Thumbnail file is missing")
     }
@@ -492,7 +494,7 @@ const upload_video = asyncHandler(async (req, res) => {
             title,
             description,
             duration,
-            video: video.url,
+            videoFile: video.url,
             thumbnail: thumbnail.url,
             owner: req.user._id
         }
@@ -505,6 +507,15 @@ const upload_video = asyncHandler(async (req, res) => {
 
 })
 
+const deleteVideo = asyncHandler(async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        throw new ApiError(400, "id is missing")
+    }
+    const toDelete = await Video.findById(id);
+
+})
 
 
 export {

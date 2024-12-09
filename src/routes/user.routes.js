@@ -53,7 +53,7 @@ router.route("/c/:username").get(verifyJWT, getUserChannelProfile)
 
 router.route("/history").get(verifyJWT, getWatchHistory)
 
-router.route("/upload_video").post(
+router.route("/uploadV").post(
     upload.fields([
         {
             name: "videoFile",
@@ -64,7 +64,7 @@ router.route("/upload_video").post(
             maxCount: 1
         }
     ]),
-    upload_video
+    verifyJWT, upload_video
 )
 
 export default router
