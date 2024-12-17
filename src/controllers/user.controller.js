@@ -4,7 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js"
 import { Video } from "../models/video.model.js"
-
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -158,7 +158,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         req.user._id,
         {
             $set: {
-                refreshToken: undefined
+                refreshToken: null
             }
         },
         {
